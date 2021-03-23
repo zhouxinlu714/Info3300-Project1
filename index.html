@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+    </head>
+    <body>
+        <h1>Project 1</h1>
+        <h3>Sijin Li (sl2624)
+            Xinlu Zhou (xz633)
+        </h3>
+        <svg id="datavis" height="1000" , width="1000"> 
+            <text id="label" x='790' y= '420' text-anchor="end" alignment-baseline="hanging"></text>
+        </svg>
+        <script>
+            d3.csv("../happiness.csv").then(data => {
+                console.log(data)
+                const svg = d3.select("svg#datavis");
+                const width = svg.attr("width");
+                const height = svg.attr("height");
+                const margin = { top: 10, right: 10, bottom: 40, left: 60 };
+                const chartWidth = width - margin.left - margin.right;
+                const chartHeight = height - margin.top - margin.bottom;
+
+                let annotations = svg.append("g").attr("id", "annotations");
+                let plot = svg.append("g")
+                                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            });
+        </script>
+    </body>
+</html>
