@@ -2,18 +2,28 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v6.min.js"></script>
+        <style>
+            .gridlines line {
+                stroke: #ddd;
+            }
+    
+            .gridlines .domain {
+                stroke: none;
+            }
+        </style>
     </head>
     <body>
         <h1>Project 1</h1>
         <h3>Sijin Li (sl2624)
             Xinlu Zhou (xz633)
         </h3>
-        <svg id="datavis" height="1000" , width="1000"> 
+        <svg id="datavis" height="500" , width="800"> 
             <text id="label" x='790' y= '420' text-anchor="end" alignment-baseline="hanging"></text>
         </svg>
         <script>
-            d3.csv("../happiness.csv").then(data => {
-                console.log(data)
+            d3.csv("../happiness.csv", d3.autoType).then(data => {
+                var topdata = data.slice(0,10);
+                console.log(topdata)
                 const svg = d3.select("svg#datavis");
                 const width = svg.attr("width");
                 const height = svg.attr("height");
@@ -21,10 +31,50 @@
                 const chartWidth = width - margin.left - margin.right;
                 const chartHeight = height - margin.top - margin.bottom;
 
+                topdata.forEach( (d, i) => {
+                    d['country'] = d['Country or region'];
+                    });
+
                 let annotations = svg.append("g").attr("id", "annotations");
                 let plot = svg.append("g")
                                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+                const scoreExtent = d3.extent(topdata, d => d['Score']);
+                const yScale = d3.scaleLinear().domain([0, scoreExtent[1]]).range([chartHeight, 0]);
+                console.log(scoreExtent)
+
+                const genres = d3.map(topdata, d => d.country) 
+                console.log(genres)
+                const xScale = d3.scaleBand().domain(genres).range([0, chartWidth])
+                             .padding(0.05);
+
+                //axis-x
+                let bottomAxis = d3.axisBottom(xScale)
+                annotations.append("g")
+                .attr("class", "x axis")
+                .attr("transform",`translate(${margin.left},${chartHeight+margin.top+10})`)
+                .call(bottomAxis);
+
+                //axis-y
+                let leftAxis = d3.axisLeft(yScale);
+                let leftGridlines = d3.axisLeft(yScale)
+                                  .tickSize(-chartWidth-20)
+                                  .tickFormat("");
+
+                annotations.append("g")
+                    .attr("class", "y axis")
+                    .attr("transform", "translate(" + (margin.left - 10) + "," + margin.top + ")")
+                    .call(leftAxis);
+
+                annotations.append("g")
+                    .attr("class", "y gridlines")
+                    .attr("transform", "translate(" + (margin.left - 10) + "," + margin.top + ")")
+                    .call(leftGridlines);
+                
+                var stackedData = d3.stack()
+                .keys(data.columns.slice(1))(topdata)
+
+                console.log(stackedData)
 
             });
         </script>
