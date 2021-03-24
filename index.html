@@ -17,7 +17,7 @@
         <h3>Sijin Li (sl2624)
             Xinlu Zhou (xz633)
         </h3>
-        <svg id="datavis" height="500" , width="800"> 
+        <svg id="datavis" height="800" , width="800"> 
             <text id="label" x='790' y= '420' text-anchor="end" alignment-baseline="hanging"></text>
         </svg>
         <script>
@@ -27,7 +27,7 @@
                 const svg = d3.select("svg#datavis");
                 const width = svg.attr("width");
                 const height = svg.attr("height");
-                const margin = { top: 10, right: 10, bottom: 40, left: 60 };
+                const margin = { top: 10, right: 10, bottom: 200, left: 60 };
                 const chartWidth = width - margin.left - margin.right;
                 const chartHeight = height - margin.top - margin.bottom;
 
@@ -74,7 +74,62 @@
                 var stackedData = d3.stack()
                 .keys(data.columns.slice(1))(topdata)
 
-                console.log(stackedData)
+                var stack = d3.stack()
+                .keys(["Freedom to make life choices", "GDP per capita", "Generosity", "Healthy life expectancy","Perceptions of corruption","Social support"])
+                .order(d3.stackOrderNone)
+                .offset(d3.stackOffsetNone);
+
+                var series = stack(topdata);
+
+                console.log(series)
+
+                const color = d3.scaleOrdinal().domain(genres).range(['#003f5c','#444e86','#955196','#dd5182','#ff6e54','#ffa600'])
+  
+                const rects = plot.selectAll("g").data(series).enter()
+                    .append("g")
+                    .attr("fill", d => color(d.key));
+
+                var padding = 40;
+                
+                rects.selectAll("rect")
+                    .data(d => d)
+                    .join("rect")
+                    .attr("x", (d, i) => xScale(d.data.country))
+                    .attr("y", d=> yScale(d[1]))
+                    .attr("height", d=> yScale(d[0]) - yScale(d[1]))
+                    .attr("width", xScale.bandwidth())
+
+                    var legend = svg.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', 'translate(' + (padding + 12) + ','+ (height-150)  + ')');
+
+                legend.selectAll('rect')
+                    .data(series)
+                    .enter()
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', function(d,i){
+                        return i * 18;
+                    })
+                    .attr('width', 12)
+                    .attr('height', 12)
+                    .attr('fill', function(d,i){
+                        return color(i);
+                    });
+
+                legend.selectAll('text')
+                    .data(series)
+                    .enter()
+                    .append('text')
+                    .text(function(d){
+                        return d.key;
+                    })
+                    .attr('x', 15)
+                    .attr('y', function(d, i){
+                        return i * 18;
+                    })
+                    .attr('text-anchor', 'start')
+                    .attr('alignment-baseline', 'hanging');
 
             });
         </script>
