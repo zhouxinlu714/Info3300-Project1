@@ -10,17 +10,20 @@
             height: 500px;
             position: relative;
         }
-
         .gridlines line {
             stroke: #ddd;
         }
-
         .gridlines .domain {
             stroke: none;
         }
-
         .y.label {
-            font: 14px Helvetica;
+            font: 14px sans-serif ;
+        }
+        .rating {
+            font: 12px Helvetica;
+        }
+        .tooltip {
+            font: 12px Helvetica;
         }
     </style>
 </head>
@@ -82,12 +85,12 @@
 
             annotations.append("g")
                 .attr("class", "y axis")
-                .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
+                .attr("transform", "translate(" + (margin.left - 15) + "," + margin.top + ")")
                 .call(leftAxis)
 
             annotations.append("text")
                 .attr("class", "y label")
-                .attr("text-anchor", "end")
+                .attr("text-anchor", "middle")
                 .attr("y", 6)
                 .attr("dy", ".75em")
                 .attr("transform", "rotate(-90)")
@@ -96,7 +99,7 @@
 
             annotations.append("g")
                 .attr("class", "y gridlines")
-                .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
+                .attr("transform", "translate(" + (margin.left - 15) + "," + margin.top + ")")
                 .call(leftGridlines);
 
             var stack = d3.stack()
@@ -116,9 +119,10 @@
 
             // create a tooltip
             var Tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
                 .style("background-color", "white")
                 .style("border", "solid")
-                .style("border-width", "2px")
+                .style("border-width", "1px")
                 .style("border-radius", "5px")
                 .style("padding", "5px")
                 .style("position", "absolute")
@@ -150,11 +154,23 @@
                 .on("mouseover", Mouseover)
                 .on("mouseout", Mouseleave);
 
+            // add labels for each bar's score
+            topdata.forEach( (d, i) => {
+                let label_x = xScale(d.country) + xScale.bandwidth()/2;
+                let label_y = yScale(d.Score)-20;
+                plot.append("text")
+                .attr("class", "rating")
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "auto")
+                .attr("transform", "translate("+label_x+","+ label_y+") rotate(-60)")
+                .text(d.Score);
+            });
+
 
             var legend = svg.append('g')
                 .attr('class', 'legend')
                 .attr('transform', 'translate(' + (padding + 12) + ',' + (height - 150) + ')');
-       
+
             legend.selectAll('rect')
                 .data(series)
                 .enter()
