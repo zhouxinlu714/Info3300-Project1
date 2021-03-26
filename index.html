@@ -3,6 +3,12 @@
     <head>
         <script src="https://d3js.org/d3.v6.min.js"></script>
         <style>
+        body {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                width: 960px;
+                height: 500px;
+                position: relative;
+            }
             .gridlines line {
                 stroke: #ddd;
             }
@@ -26,7 +32,6 @@
         <script>
             d3.csv("./happiness.csv", d3.autoType).then(data => {
                 let topdata = data.slice(0,10);
-                console.log("topdata", topdata);
                 topdata.forEach( d => {
                   d["dystopia"] = 1.85;
                   data_sum = d["Freedom to make life choices"] + d["GDP per capita"]+ d["Generosity"]+
@@ -34,7 +39,7 @@
                   d["unexpected"] = (d["Score"] - d["dystopia"]-data_sum).toFixed(3);
                   d["unexpected"] = Number(d["unexpected"]);
                 });
-                console.log("new topdata", topdata)
+
 
                 const svg = d3.select("svg#datavis");
                 const width = svg.attr("width");
@@ -50,6 +55,7 @@
                 let annotations = svg.append("g").attr("id", "annotations");
                 let plot = svg.append("g")
                               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                let tips = svg.append("g").attr("id", "tips");
 
                 const scoreExtent = d3.extent(topdata, d => d['Score']);
                 const yScale = d3.scaleLinear().domain([0, 10]).range([chartHeight, 0]);
@@ -112,9 +118,94 @@
 
                 var padding = 40;
 
-                series.forEach((d, i) => {
-                  console.log(i, d[0], d[1])
-                });
+                var box = tips.append("rect")
+                .style("opacity", 0)
+                .style("fill", "white")
+                .style("stroke", "black")
+                .style("stroke-width", "2px")
+                .attr("width", "100")
+                .attr("height", "50")
+                .attr("rx", "15")
+                .attr("ry", "15");
+
+                var Mouseover = function(d){
+                  let cur_x = d3.select(this).attr("x");
+                  let cur_y = d3.select(this).attr("y");
+                  box.style("opacity", 1)
+                     .attr("x", cur_x+20)
+                     .attr("y", cur_y+20);
+                  d3.select(this)
+                    .style("stroke", "black")
+                    // .style("opacity", 1);
+                }
+
+                var Mousemove = function(d){
+                  let cur_x = d3.select(this).attr("x");
+                  let cur_y = d3.select(this).attr("y");
+                  box.style("opacity", 0.8)
+                     .attr("x", cur_x+20)
+                     .attr("y", cur_y+20);
+                  d3.select(this)
+                    .style("stroke", "black")
+                    // .style("opacity", 1);
+                }
+
+                var Mouseleave = function(d) {
+                  box.style("opacity", 0);
+                  d3.select(this)
+                    .style("stroke", "none")
+                    // .style("opacity", 1);
+                }
+
+                // create a tooltip
+                var Tooltip = d3.select("body").append("div")
+                                .style("opacity", 1)
+                                .attr("class", "tooltip")
+                                .text("hello!")
+                                .style("background-color", "white")
+                                .style("border", "solid")
+                                .style("border-width", "2px")
+                                .style("border-radius", "5px")
+                                .style("padding", "5px")
+                                .style("position", "absolute")
+                                .style("left", "0 px")
+                                .style("top", "0 px");
+
+
+
+
+                // // Three function that change the tooltip when user hover / move / leave a cell
+                //  var Mouseover = function(d) {
+                //
+                //    Tooltip
+                //      .html("mousemove in tooltip")
+                //      .style("opacity", 1)
+                //      .style("left", (d3.select(this).attr("x")) + "px")
+                //      .style("top", (d3.select(this).attr("y")) + "px")
+                //      // .text("a simple tooltip")
+                //
+                //    d3.select(this)
+                //      .style("stroke", "black")
+                //      .style("opacity", 1)
+                //   console.log(d3.select(this).attr("x"), d3.select(this).attr("y"))
+                //  }
+                //  var Mousemove = function(d) {
+                //    // console.log("mousemove", d3.mouse(this))
+                //    Tooltip
+                //      .html("mousemove in tooltip")
+                //      .style("left", (d3.select(this).attr("x")) + "px")
+                //      .style("top", (d3.select(this).attr("y")) + "px")
+                //
+                //  }
+                //  var Mouseleave = function(d) {
+                //    Tooltip
+                //      .style("opacity", 0)
+                //    d3.select(this)
+                //      .style("stroke", "none")
+                //      .style("opacity", 1)
+                //  }
+                //
+
 
                 rects.selectAll("rect")
                     .data(d => d)
@@ -123,6 +214,11 @@
                     .attr("y", d=> yScale(d[1]))
                     .attr("height", d=> yScale(d[0]) - yScale(d[1]))
                     .attr("width", xScale.bandwidth())
+                    .attr("label", d=> yScale(d[0]) - yScale(d[1]))
+                    .on("mouseover", Mouseover)
+                    .on("mousemove", Mousemove)
+                    .on("mouseout", Mouseleave);
+
 
                 var legend = svg.append('g')
                 .attr('class', 'legend')
