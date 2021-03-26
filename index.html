@@ -1,162 +1,190 @@
 <!-- <!DOCTYPE html> -->
 <html>
-    <head>
-        <script src="https://d3js.org/d3.v6.min.js"></script>
-        <style>
-            .gridlines line {
-                stroke: #ddd;
-            }
 
-            .gridlines .domain {
-                stroke: none;
-            }
-            .y.label{
-                font: 14px Helvetica;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Project 1</h1>
-        <h3>Sijin Li (sl2624)
-            Xinlu Zhou (xz633)
-        </h3>
-        <svg id="datavis" height="800" , width="800", style="margin-left: 20px">
-            <text id="label" x='790' y= '420' text-anchor="end" alignment-baseline="hanging"></text>
-        </svg>
-        <script>
-            d3.csv("./happiness.csv", d3.autoType).then(data => {
-                let topdata = data.slice(0,10);
-                console.log("topdata", topdata);
-                topdata.forEach( d => {
-                  d["dystopia"] = 1.85;
-                  data_sum = d["Freedom to make life choices"] + d["GDP per capita"]+ d["Generosity"]+
-                  d["Healthy life expectancy"]+d["Perceptions of corruption"]+d["Social support"];
-                  d["unexpected"] = (d["Score"] - d["dystopia"]-data_sum).toFixed(3);
-                  d["unexpected"] = Number(d["unexpected"]);
-                });
-                console.log("new topdata", topdata)
+<head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            width: 960px;
+            height: 500px;
+            position: relative;
+        }
 
-                const svg = d3.select("svg#datavis");
-                const width = svg.attr("width");
-                const height = svg.attr("height");
-                const margin = { top: 10, right: 10, bottom: 200, left: 60 };
-                const chartWidth = width - margin.left - margin.right;
-                const chartHeight = height - margin.top - margin.bottom;
+        .gridlines line {
+            stroke: #ddd;
+        }
 
-                topdata.forEach( (d, i) => {
-                    d['country'] = d['Country or region'];
-                    });
+        .gridlines .domain {
+            stroke: none;
+        }
 
-                let annotations = svg.append("g").attr("id", "annotations");
-                let plot = svg.append("g")
-                              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .y.label {
+            font: 14px Helvetica;
+        }
+    </style>
+</head>
 
-                const scoreExtent = d3.extent(topdata, d => d['Score']);
-                const yScale = d3.scaleLinear().domain([0, 10]).range([chartHeight, 0]);
-                console.log("score extent", scoreExtent)
+<body>
+    <h1>Project 1</h1>
+    <h3>Sijin Li (sl2624)
+        Xinlu Zhou (xz633)
+    </h3>
+    <svg id="datavis" height="800" , width="800" , style="margin-left: 20px">
+        <text id="label" x='790' y='420' text-anchor="end" alignment-baseline="hanging"></text>
+    </svg>
+    <script>
+        d3.csv("./happiness.csv", d3.autoType).then(data => {
+            let topdata = data.slice(0, 10);
+            topdata.forEach(d => {
+                d["dystopia"] = 1.85;
+                data_sum = d["Freedom to make life choices"] + d["GDP per capita"] + d["Generosity"] +
+                    d["Healthy life expectancy"] + d["Perceptions of corruption"] + d["Social support"];
+                d["unexpected"] = (d["Score"] - d["dystopia"] - data_sum).toFixed(3);
+                d["unexpected"] = Number(d["unexpected"]);
+            });
 
-                const genres = d3.map(topdata, d => d.country)
-                console.log(genres)
-                const xScale = d3.scaleBand().domain(genres).range([0, chartWidth])
-                             .padding(0.05);
 
-                //axis-x
-                let bottomAxis = d3.axisBottom(xScale)
-                annotations.append("g")
+            const svg = d3.select("svg#datavis");
+            const width = svg.attr("width");
+            const height = svg.attr("height");
+            const margin = { top: 10, right: 10, bottom: 200, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            topdata.forEach((d, i) => {
+                d['country'] = d['Country or region'];
+            });
+
+            let annotations = svg.append("g").attr("id", "annotations");
+            let plot = svg.append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            const scoreExtent = d3.extent(topdata, d => d['Score']);
+            const yScale = d3.scaleLinear().domain([0, 10]).range([chartHeight, 0]);
+
+            const genres = d3.map(topdata, d => d.country)
+            const xScale = d3.scaleBand().domain(genres).range([0, chartWidth])
+                .padding(0.05);
+
+            //axis-x
+            let bottomAxis = d3.axisBottom(xScale)
+            annotations.append("g")
                 .attr("class", "x axis")
-                .attr("transform",`translate(${margin.left},${chartHeight+margin.top+10})`)
+                .attr("transform", `translate(${margin.left},${chartHeight + margin.top + 10})`)
                 .call(bottomAxis);
 
-                //axis-y
-                let leftAxis = d3.axisLeft(yScale);
-                let leftGridlines = d3.axisLeft(yScale)
-                                  .tickSize(-chartWidth-20)
-                                  .tickFormat("");
+            //axis-y
+            let leftAxis = d3.axisLeft(yScale);
+            let leftGridlines = d3.axisLeft(yScale)
+                .tickSize(-chartWidth - 20)
+                .tickFormat("");
 
-                annotations.append("g")
-                    .attr("class", "y axis")
-                    .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
-                    .call(leftAxis)
+            annotations.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
+                .call(leftAxis)
 
-                annotations.append("text")
-                    .attr("class", "y label")
-                    .attr("text-anchor", "end")
-                    .attr("y", 6)
-                    .attr("dy", ".75em")
-                    .attr("transform", "rotate(-90)")
-                    .attr("text-anchor", "end")
-                    .text("happiness rating");
+            annotations.append("text")
+                .attr("class", "y label")
+                .attr("text-anchor", "end")
+                .attr("y", 6)
+                .attr("dy", ".75em")
+                .attr("transform", "rotate(-90)")
+                .attr("text-anchor", "end")
+                .text("happiness rating");
 
-                annotations.append("g")
-                    .attr("class", "y gridlines")
-                    .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
-                    .call(leftGridlines);
+            annotations.append("g")
+                .attr("class", "y gridlines")
+                .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
+                .call(leftGridlines);
 
-                var stackedData = d3.stack()
-                .keys(data.columns.slice(1))(topdata)
-
-                var stack = d3.stack()
-                .keys(["Freedom to make life choices", "GDP per capita", "Generosity", "Healthy life expectancy","Perceptions of corruption","Social support","dystopia","unexpected"])
+            var stack = d3.stack()
+                .keys(["Freedom to make life choices", "GDP per capita", "Generosity", "Healthy life expectancy", "Perceptions of corruption", "Social support", "dystopia", "unexpected"])
                 .order(d3.stackOrderNone)
                 .offset(d3.stackOffsetNone);
 
-                var series = stack(topdata);
-                // var series = stack(stackedData);
+            var series = stack(topdata);
+            console.log(series);
+            const color = d3.scaleOrdinal().domain(genres).range(['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', "#18D6B1", "#18D5D6"])
+            const rects = plot.selectAll("g").data(series).enter()
+                .append("g")
+                .attr("fill", d => color(d.key))
+                .attr("test", d => d.key);
 
-                console.log("series", series)
+            var padding = 40;
 
-                const color = d3.scaleOrdinal().domain(genres).range(['#003f5c','#444e86','#955196','#dd5182','#ff6e54','#ffa600', "#18D6B1", "#18D5D6"])
-                const rects = plot.selectAll("g").data(series).enter()
-                    .append("g")
-                    .attr("fill", d => color(d.key));
+            // create a tooltip
+            var Tooltip = d3.select("body").append("div")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("border-width", "2px")
+                .style("border-radius", "5px")
+                .style("padding", "5px")
+                .style("position", "absolute")
+                .style("display", "none");
 
-                var padding = 40;
+            var Mouseover = function (d) {
+                d3.select(this)
+                    .style("stroke", "black")
+                Tooltip.style("left", d.pageX + 10 + "px")
+                    .style("top", d.pageY - 25 + "px")
+                    .style("display", "inline-block")
+                    .html(d3.select(this.parentNode).datum().key + ": " + d3.select(this).attr("label"));
+            }
 
-                series.forEach((d, i) => {
-                  console.log(i, d[0], d[1])
+            var Mouseleave = function (d) {
+                Tooltip.style("display", "none");
+                d3.select(this)
+                    .style("stroke", "none")
+            }
+
+            rects.selectAll("rect")
+                .data(d => d)
+                .join("rect")
+                .attr("x", (d, i) => xScale(d.data.country))
+                .attr("y", d => yScale(d[1]))
+                .attr("height", d => yScale(d[0]) - yScale(d[1]))
+                .attr("width", xScale.bandwidth())
+                .attr("label", d => (d[1] - d[0]).toFixed(3))
+                .on("mouseover", Mouseover)
+                .on("mouseout", Mouseleave);
+
+
+            var legend = svg.append('g')
+                .attr('class', 'legend')
+                .attr('transform', 'translate(' + (padding + 12) + ',' + (height - 150) + ')');
+       
+            legend.selectAll('rect')
+                .data(series)
+                .enter()
+                .append('rect')
+                .attr('x', 0)
+                .attr('y', function (d, i) {
+                    return i * 18;
+                })
+                .attr('width', 12)
+                .attr('height', 12)
+                .attr('fill', function (d, i) {
+                    return color(i);
                 });
 
-                rects.selectAll("rect")
-                    .data(d => d)
-                    .join("rect")
-                    .attr("x", (d, i) => xScale(d.data.country))
-                    .attr("y", d=> yScale(d[1]))
-                    .attr("height", d=> yScale(d[0]) - yScale(d[1]))
-                    .attr("width", xScale.bandwidth())
+            legend.selectAll('text')
+                .data(series)
+                .enter()
+                .append('text')
+                .text(function (d) {
+                    return d.key;
+                })
+                .attr('x', 15)
+                .attr('y', function (d, i) {
+                    return i * 18;
+                })
+                .attr('text-anchor', 'start')
+                .attr('alignment-baseline', 'hanging');
 
-                var legend = svg.append('g')
-                .attr('class', 'legend')
-                .attr('transform', 'translate(' + (padding + 12) + ','+ (height-150)  + ')');
+        });
+    </script>
+</body>
 
-                legend.selectAll('rect')
-                    .data(series)
-                    .enter()
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', function(d,i){
-                        return i * 18;
-                    })
-                    .attr('width', 12)
-                    .attr('height', 12)
-                    .attr('fill', function(d,i){
-                        return color(i);
-                    });
-
-                legend.selectAll('text')
-                    .data(series)
-                    .enter()
-                    .append('text')
-                    .text(function(d){
-                        return d.key;
-                    })
-                    .attr('x', 15)
-                    .attr('y', function(d, i){
-                        return i * 18;
-                    })
-                    .attr('text-anchor', 'start')
-                    .attr('alignment-baseline', 'hanging');
-
-            });
-        </script>
-    </body>
 </html>
