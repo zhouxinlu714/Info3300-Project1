@@ -33,7 +33,7 @@
     <h3>Sijin Li (sl2624)
         Xinlu Zhou (xz633)
     </h3>
-    <svg id="datavis" height="600" , width="1000" , style="margin-left: 20px">
+    <svg id="datavis" height="800" , width="1000" , style="margin-left: 20px">
         <text id="label" x='790' y='420' text-anchor="end" alignment-baseline="hanging"></text>
     </svg>
     <script>
@@ -51,7 +51,7 @@
             const svg = d3.select("svg#datavis");
             const width = svg.attr("width");
             const height = svg.attr("height");
-            const margin = { top: 10, right: 300, bottom: 60, left: 60 };
+            const margin = { top: 25, right: 10, bottom: 200, left: 60 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
@@ -121,7 +121,7 @@
                 .attr("class", "tooltip")
                 .style("background-color", "white")
                 .style("border", "none")
-                .style("border-width", "2px")
+                .style("border-width", "1px")
                 .style("border-radius", "5px")
                 .style("padding", "5px")
                 .style("position", "absolute")
@@ -155,10 +155,31 @@
                 .on("mouseover", Mouseover)
                 .on("mouseout", Mouseleave);
 
+            // add labels for each bar's score
+             topdata.forEach( (d, i) => {
+                 let label_x = xScale(d.country) + xScale.bandwidth()/2;
+                 let label_y = yScale(d.Score)-20;
+                 plot.append("text")
+                 .attr("class", "rating")
+                 .attr("text-anchor", "middle")
+                 .attr("dominant-baseline", "auto")
+                 .attr("transform", "translate("+label_x+","+ label_y+") rotate(-60)")
+                 .text(d.Score);
+             });
+
+            // add title
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", margin.top / 2)
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text("Happiness Ratings for Top 10 Happiest Countries");
+
             var legend = svg.append('g')
                 .attr('class', 'legend')
                 .attr('transform', 'translate(' + 700 + ',' + (height-600) + ')');
-       
+
             legend.selectAll('rect')
                 .data(series)
                 .enter()
