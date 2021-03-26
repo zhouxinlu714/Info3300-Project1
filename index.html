@@ -51,7 +51,7 @@
             const svg = d3.select("svg#datavis");
             const width = svg.attr("width");
             const height = svg.attr("height");
-            const margin = { top: 10, right: 10, bottom: 200, left: 60 };
+            const margin = { top: 25, right: 10, bottom: 200, left: 60 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
@@ -85,21 +85,20 @@
 
             annotations.append("g")
                 .attr("class", "y axis")
-                .attr("transform", "translate(" + (margin.left - 15) + "," + margin.top + ")")
+                .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
                 .call(leftAxis)
 
-            annotations.append("text")
+            plot.append("text")
                 .attr("class", "y label")
-                .attr("text-anchor", "middle")
-                .attr("y", 6)
-                .attr("dy", ".75em")
+                .attr("y", 20 - margin.top)
+                .attr("dy", ".2em")
                 .attr("transform", "rotate(-90)")
                 .attr("text-anchor", "end")
                 .text("happiness rating");
 
             annotations.append("g")
                 .attr("class", "y gridlines")
-                .attr("transform", "translate(" + (margin.left - 15) + "," + margin.top + ")")
+                .attr("transform", "translate(" + (margin.left - 20) + "," + margin.top + ")")
                 .call(leftGridlines);
 
             var stack = d3.stack()
@@ -166,7 +165,16 @@
                 .text(d.Score);
             });
 
+            // add title
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", margin.top / 2)
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text("Happiness Ratings for Top 10 Happiest Countries");
 
+            // add legend
             var legend = svg.append('g')
                 .attr('class', 'legend')
                 .attr('transform', 'translate(' + (padding + 12) + ',' + (height - 150) + ')');
