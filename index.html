@@ -33,7 +33,7 @@
     <h3>Sijin Li (sl2624)
         Xinlu Zhou (xz633)
     </h3>
-    <svg id="datavis" height="800" , width="1000" , style="margin-left: 20px">
+    <svg id="datavis" height="800" , width="1200" , style="margin-left: 20px">
         <text id="label" x='790' y='420' text-anchor="end" alignment-baseline="hanging"></text>
     </svg>
     <script>
@@ -47,11 +47,10 @@
                 d["residual"] = Number(d["residual"]);
             });
 
-
             const svg = d3.select("svg#datavis");
             const width = svg.attr("width");
             const height = svg.attr("height");
-            const margin = { top: 25, right: 10, bottom: 200, left: 60 };
+            const margin = { top: 50, right: 250, bottom: 200, left: 60 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
@@ -68,7 +67,7 @@
 
             const genres = d3.map(topdata, d => d.country)
             const xScale = d3.scaleBand().domain(genres).range([0, chartWidth])
-                .padding(0.05);
+                .padding(0.2);
 
             //axis-x
             let bottomAxis = d3.axisBottom(xScale)
@@ -90,11 +89,11 @@
 
             plot.append("text")
                 .attr("class", "y label")
-                .attr("y", 20 - margin.top)
+                .attr("y", 50 - margin.top)
                 .attr("dy", ".2em")
                 .attr("transform", "rotate(-90)")
                 .attr("text-anchor", "end")
-                .text("Happiness rating");
+                .text("Happiness score");
 
             annotations.append("g")
                 .attr("class", "y gridlines")
@@ -108,13 +107,11 @@
 
             var series = stack(topdata);
             console.log(series);
-            const color = d3.scaleOrdinal().domain(genres).range(['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', "#18D6B1", "#18D5D6"])
+            const color = d3.scaleOrdinal().domain(genres).range(['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', "#6AD194", "#18D5D6"])
             const rects = plot.selectAll("g").data(series).enter()
                 .append("g")
                 .attr("fill", d => color(d.key))
                 .attr("test", d => d.key);
-
-            var padding = 40;
 
             // create a tooltip
             var Tooltip = d3.select("body").append("div")
@@ -164,6 +161,7 @@
                  .attr("text-anchor", "middle")
                  .attr("dominant-baseline", "auto")
                  .attr("transform", "translate("+label_x+","+ label_y+") rotate(-60)")
+                 .style("font-weight", "bold")
                  .text(d.Score);
              });
 
@@ -172,13 +170,13 @@
                 .attr("x", width / 2)
                 .attr("y", margin.top / 2)
                 .attr("text-anchor", "middle")
-                .style("font-size", "16px")
-                .style("text-decoration", "underline")
+                .style("font-size", "20px")
                 .text("Happiness Ratings for Top 10 Happiest Countries");
 
             var legend = svg.append('g')
                 .attr('class', 'legend')
-                .attr('transform', 'translate(' + 700 + ',' + (height-600) + ')');
+                .attr('transform', 'translate(' + 970 + ',' + (height-500) + ')')
+                .style("margin-bottom", "5px");
 
             legend.selectAll('rect')
                 .data(series)
