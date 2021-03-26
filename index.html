@@ -30,7 +30,7 @@
     <h3>Sijin Li (sl2624)
         Xinlu Zhou (xz633)
     </h3>
-    <svg id="datavis" height="800" , width="800" , style="margin-left: 20px">
+    <svg id="datavis" height="600" , width="1000" , style="margin-left: 20px">
         <text id="label" x='790' y='420' text-anchor="end" alignment-baseline="hanging"></text>
     </svg>
     <script>
@@ -40,15 +40,15 @@
                 d["dystopia"] = 1.85;
                 data_sum = d["Freedom to make life choices"] + d["GDP per capita"] + d["Generosity"] +
                     d["Healthy life expectancy"] + d["Perceptions of corruption"] + d["Social support"];
-                d["unexpected"] = (d["Score"] - d["dystopia"] - data_sum).toFixed(3);
-                d["unexpected"] = Number(d["unexpected"]);
+                d["residual"] = (d["Score"] - d["dystopia"] - data_sum).toFixed(3);
+                d["residual"] = Number(d["residual"]);
             });
 
 
             const svg = d3.select("svg#datavis");
             const width = svg.attr("width");
             const height = svg.attr("height");
-            const margin = { top: 10, right: 10, bottom: 200, left: 60 };
+            const margin = { top: 10, right: 300, bottom: 60, left: 60 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
@@ -92,7 +92,7 @@
                 .attr("dy", ".75em")
                 .attr("transform", "rotate(-90)")
                 .attr("text-anchor", "end")
-                .text("happiness rating");
+                .text("Happiness rating");
 
             annotations.append("g")
                 .attr("class", "y gridlines")
@@ -100,7 +100,7 @@
                 .call(leftGridlines);
 
             var stack = d3.stack()
-                .keys(["Freedom to make life choices", "GDP per capita", "Generosity", "Healthy life expectancy", "Perceptions of corruption", "Social support", "dystopia", "unexpected"])
+                .keys(["Freedom to make life choices", "GDP per capita", "Generosity", "Healthy life expectancy", "Perceptions of corruption", "Social support", "dystopia", "residual"])
                 .order(d3.stackOrderNone)
                 .offset(d3.stackOffsetNone);
 
@@ -117,20 +117,22 @@
             // create a tooltip
             var Tooltip = d3.select("body").append("div")
                 .style("background-color", "white")
-                .style("border", "solid")
+                .style("border", "none")
                 .style("border-width", "2px")
                 .style("border-radius", "5px")
                 .style("padding", "5px")
                 .style("position", "absolute")
-                .style("display", "none");
+                .style("display", "none")
+                .style("padding", "10px")
+                .style("box-shadow", "-3px 3px 15px #888888");
 
             var Mouseover = function (d) {
                 d3.select(this)
                     .style("stroke", "black")
                 Tooltip.style("left", d.pageX + 10 + "px")
-                    .style("top", d.pageY - 25 + "px")
-                    .style("display", "inline-block")
-                    .html(d3.select(this.parentNode).datum().key + ": " + d3.select(this).attr("label"));
+                       .style("top", d.pageY - 25 + "px")
+                       .style("display", "inline-block")
+                       .html(d3.select(this.parentNode).datum().key + ": " + d3.select(this).attr("label"));
             }
 
             var Mouseleave = function (d) {
@@ -150,10 +152,9 @@
                 .on("mouseover", Mouseover)
                 .on("mouseout", Mouseleave);
 
-
             var legend = svg.append('g')
                 .attr('class', 'legend')
-                .attr('transform', 'translate(' + (padding + 12) + ',' + (height - 150) + ')');
+                .attr('transform', 'translate(' + 700 + ',' + (height-600) + ')');
        
             legend.selectAll('rect')
                 .data(series)
